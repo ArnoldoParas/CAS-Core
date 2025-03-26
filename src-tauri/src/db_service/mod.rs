@@ -9,6 +9,7 @@ pub mod maintenance;
 pub mod statistics;
 pub mod model;
 
+#[derive(Clone)]
 pub struct DbService {
     client: FirestoreDb
 }
