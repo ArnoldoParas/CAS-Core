@@ -42,4 +42,9 @@ impl DbService {
             Ok(())
         }
     }
+
+    pub async fn get_instance() -> Option<Self> {
+        let global_service = Self::global().await.lock().await;
+        global_service.clone()
+    }
 }
