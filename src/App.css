@@ -1,0 +1,343 @@
+:root {
+  /* font-family: Inter, Avenir, Helvetica, Arial, sans-serif; */
+  font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color: #0f0f0f;
+  background-color: var(--black);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+:root {
+  --black: hsl(240, 7%, 24%);
+  --black-secondary: hsl(223, 7%, 20%);
+  --icon-black: invert(17%) sepia(73%) saturate(75%) hue-rotate(201deg) brightness(91%) contrast(84%);
+  --white: hsl(45, 15%, 95%);
+  --white-secondary: hsl(42, 17%, 88%);
+  --icon-white: invert(94%) sepia(96%) saturate(14%) hue-rotate(344deg) brightness(100%) contrast(92%);;
+  --btn-primary-dark: #23A159;
+  --btn-primary-light: hsl(158, 47%, 21%);
+  --btn-secondary: hsl(154, 32%, 39%);
+  --btn-hover: hsl(220, 7%, 24%);
+  --sidebar-text-dark: hsl(240, 1%, 50%);
+  --sidebar-text-light: hsl(225, 14%, 23%);
+}
+
+/* Variables de colores para cada tema */
+.theme-light {
+  --bg-color: var(--white);
+  --bg-sidebar: var(--white-secondary);
+  --text-sidebar: var(--sidebar-text-light);
+  --text-normal: var(--sidebar-text-light);
+  --icon-color: var(--icon-black);
+  --btn-color: var(--btn-primary-light);
+}
+
+.theme-dark {
+  --bg-color: var(--black);
+  --bg-sidebar: var(--black-secondary);
+  --text-sidebar: var(--sidebar-text-dark);
+  --text-normal: var(--white);
+  --icon-color: var(--icon-white);
+  --btn-color: var(--btn-primary-dark);
+}
+
+* {
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+ 
+a,
+abbr,
+acronym,
+address,
+applet,
+big,
+blockquote,
+body,
+button,
+caption,
+cite,
+code,
+dd,
+del,
+dfn,
+div,
+dl,
+dt,
+em,
+fieldset,
+form,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+html,
+iframe,
+img,
+input,
+ins,
+kbd,
+label,
+legend,
+li,
+object,
+ol,
+p,
+pre,
+q,
+s,
+samp,
+small,
+span,
+strike,
+strong,
+sub,
+sup,
+table,
+tbody,
+td,
+tfoot,
+th,
+thead,
+tr,
+tt,
+ul,
+var {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-weight: inherit;
+  font-style: inherit;
+  font-family: inherit;
+  font-size: 100%;
+  vertical-align: baseline
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  vertical-align: middle
+}
+
+caption,
+td,
+th {
+  text-align: left;
+  font-weight: 400;
+  vertical-align: middle
+}
+
+ol,
+ul {
+  list-style: none
+}
+
+a img {
+  border: none
+}
+
+button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-color: transparent
+}
+
+/* Estilos del contenedor principal */
+.container {
+  background-color: var(--bg-color);
+  color: var(--text-normal);
+}
+
+.icon {
+  width: 23px;
+  height: 23px;
+  filter: var(--icon-color);
+}
+
+.container {
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  text-align: center;
+}
+
+.sidebar {
+  max-width: 200px;
+  height: 100vh;
+  background-color: var(--bg-sidebar);
+  text-align: left;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sidebar 
+.sidebar-header button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0;
+  height: 32px;
+  width: 32px;
+  padding: 20px;
+  margin-right: 10px;
+}
+
+.sidebar-header h2 {
+  margin: 20px 0 20px 10px;
+  font-size: 24px;
+}
+
+.sidebar ul li {
+  margin: 0 10px 3px 10px;
+}
+
+.sidebar button {
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  text-align: left;
+  width: 180px;
+  padding: 10px 0 10px 10px;
+  background-color: transparent;
+  border: none;
+  border-radius: 4px;
+}
+
+.sidebar button p {
+  color: var(--text-sidebar);
+  font-size: 16px;
+  font-weight:500;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin-left: 5px;
+}
+
+.sidebar button:hover {
+  background-color: var(--btn-hover);
+}
+
+.sidebar button:hover p {
+  color: white;
+}
+
+.sidebar button:hover .icon {
+  filter: var(--icon-white);
+}
+
+.sidebar button.active {
+  background-color: var(--btn-color);
+}
+
+.sidebar button.active p {
+  color: white;
+}
+
+.sidebar button.active .icon {
+  filter: var(--icon-white);
+}
+
+.work_space {
+  padding: 20px 10px 20px 10px;
+  overflow: hidden;
+  flex-grow: 1;
+  border: 1px solid red;
+}
+
+.work_space h1 {
+  text-align: left;
+  font-weight: bold;
+  font-size: 2em;
+  margin-top: 0.25em;
+}
+
+.work_space h2 {
+  font-weight: bold;
+  font-size: 1.5em;
+  margin-top: 1em;
+}
+
+.work_space {
+  display: flex;
+  flex-flow: column;
+}
+
+.charts_area {
+  padding-top: 15px;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.line-graph {
+  width: 60%;
+  height: 250px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: var(--bg-sidebar);
+}
+
+.bar-graph {
+  width: 40%;
+  height: 250px;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: var(--bg-sidebar);
+}
+
+.button_row {
+  display: inline-block;
+}
+
+.button_row button {
+  margin-left: 10px;
+  margin-top: 1em;
+  cursor: pointer;
+  outline: none;
+  background-color: var(--btn-color);
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  color: #ffffff;
+  transition: border-color 0.25s;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.button_row button:hover {
+  border-color: #396cd8;
+}
+
+.button_row button:active {
+  border-color: #396cd8;
+  background-color: #e8e8e8;
+}
+
+/* @media screen and (max-width: 1250px) {
+  .line-graph {
+    width: 60%;
+    height: 300px;
+  }
+
+  .bar-graph {
+    width: 40%;
+    height: 300px;
+  }
+} */
