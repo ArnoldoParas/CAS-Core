@@ -1,4 +1,7 @@
-# Cas Core
+<p align="center">
+    <img width="150" src="./public/logo.png" alt="logo">
+</p>
+<h1 align="center">Cas Core</h1>
 
 ## Requisitos para ejecutar el programa
 
