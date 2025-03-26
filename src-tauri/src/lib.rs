@@ -111,6 +111,11 @@ async fn get_maintenance_stats() -> Result<String, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    block_on(async {
+        db_service::DbService::initialize()
+            .await
+            .expect("Error inicializando base de datos");
+    });
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
