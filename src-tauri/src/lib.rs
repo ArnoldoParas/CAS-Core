@@ -105,7 +105,6 @@ async fn get_maintenance_stats() -> Result<String, String> {
         },
         Err(e) => Err(format!("Error obteniendo estadísticas: {}", e))
     };
-    println!("{:?}",result);
     result
 }
 
