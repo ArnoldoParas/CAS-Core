@@ -1,4 +1,4 @@
-// use std::env::var;
+use std::env::var;
 use dotenv::dotenv;
 
 use firestore::FirestoreDb;
@@ -20,7 +20,7 @@ impl DbService {
         dotenv().ok();
         // $env:GOOGLE_APPLICATION_CREDENTIALS = "C:\secure\mi-proyecto-firestore.json"
         DbService {
-            client: FirestoreDb::new(String::from("bitacoracas-6e8e3"))   
+            client: FirestoreDb::new(String::from(var("PROJECT_ID").unwrap()))   
                 .await
                 .expect("Error al inicializar cliente Firestore")
         }
