@@ -11,8 +11,8 @@ use typst_renderer::generate_example_pdf;
 
 #[tauri::command]
 async fn get_all() -> String {
-    let db_service = DbService::new()
-        .await;
+    let db_service = DbService::get_instance().await
+        .expect("No se pudo obtener la instancia de DbService");
     
     let equipos = db_service.get_all_equipments().await.unwrap();
     let equipos = match serialize_equipos(equipos) {
@@ -38,7 +38,8 @@ fn delete_by_id() -> String {
 
 #[tauri::command]
 async fn insert_e(num: u16) -> Result<(), String> {
-    let db_service = DbService::new().await;
+    let db_service = DbService::get_instance().await
+        .expect("No se pudo obtener la instancia de DbService");
     
     let mut id = 0;
     for i in 0..num {        
@@ -55,7 +56,6 @@ async fn insert_e(num: u16) -> Result<(), String> {
 
 async fn asdf(id: &i32) -> Equipo {
     let mut rng = rand::rng();
-
 
     let equipos = vec!["Monitor".to_string(), "CPU".to_string(), "All In One".to_string(), "Impresora".to_string()];
     let marcas = vec!["Asus".to_string(), "Dell".to_string(), "Hp".to_string(), "BenQ".to_string()];
@@ -93,7 +93,8 @@ fn pdf() {
 
 #[tauri::command]
 async fn get_maintenance_stats() -> Result<String, String> {
-    let db_service = DbService::new().await;
+    let db_service = DbService::get_instance().await
+        .expect("No se pudo obtener la instancia de DbService");
 
     let result = match db_service.get_statistics(Utc::now().year()).await {
         Ok(stats) => {
