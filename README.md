@@ -47,7 +47,45 @@ Copy-Item -Path ".\service.json" -Destination "C:\Program Files\CasCore\config\"
 O bien pega las credenciales en la carpeta.
 
 
-## Limpieza al desinstalar
+### Limpieza al desinstalar
 1. Eliminar archivo .env
 2. Eliminar carpeta de credenciales:
 3. Eliminar variable de entorno del sistema (si se configuró permanente)
+
+## Como inicializar el proyecto?
+
+1. Abre la ubicacion del proyecto en la terminal.
+2. Ejecuta el comando `bun install`.
+3. Para el desarrollo de escritorio, ejecute `bun run tauri dev`
+
+> Para el desarrollo en Android, ejecute ` bun run tauri android dev`
+
+Ej.
+```powershell
+cd \cas
+bun install
++ @tauri-apps/cli@2.4.0
++ @vitejs/plugin-react@4.3.4
++ vite@6.2.3
++ @tauri-apps/api@2.4.0
++ @tauri-apps/plugin-opener@2.2.6
++ react@18.3.1 (v19.0.0 available)
++ react-dom@18.3.1 (v19.0.0 available)
+
+65 packages installed [10.50s]
+
+bun run tauri dev
+$ tauri dev
+     Running BeforeDevCommand (`bun run dev`)
+$ vite
+
+  VITE v6.2.3  ready in 477 ms
+
+  ➜  Local:   http://localhost:1420/
+     Running DevCommand (`cargo  run --no-default-features --color always --`)
+        Info Watching D:\app_test_space\tutorial\src-tauri for changes...
+   Compiling tutorial v0.1.0 (D:\app_test_space\tutorial\src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 15.35s
+     Running `target\debug\tutorial.exe`
+```
+> La primera vez que se ejecute ` bun run tauri dev` se tienen que descargar todas las librerias relacionadas a tauri y compilarlas por lo que puede ser algo tardado.
