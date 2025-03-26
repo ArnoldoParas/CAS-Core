@@ -1,14 +1,12 @@
-use std::env::var;
+use std::{env::var, sync::OnceLock};
 use dotenv::dotenv;
-
+use tauri::async_runtime::Mutex;
 use firestore::FirestoreDb;
 
 // Importar submódulos
 pub mod equipment;
 pub mod maintenance;
 pub mod statistics;
-
-// Re-exportar el modelo para que sea accesible desde fuera
 pub mod model;
 
 pub struct DbService {
