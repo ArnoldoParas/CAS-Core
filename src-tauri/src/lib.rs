@@ -129,18 +129,3 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
-
-// let _ = db_service.delete_by_id("FIM-0002".to_string())
-//     .await;
-// let _ = db_service.update_by_id(insert_doc)
-//     .await;
-
-// if let Ok(srch) = db_service.get_by_id("FIM2025-0001".to_string()).await {
-//     println!("{:?}", srch);
-// };
-
-// if let Ok(equipos) = db_service.get_by_field("marca", "ASUS").await {
-//     for equipo in equipos {
-//         println!("{:?}", equipo);
-//     }
-// }
