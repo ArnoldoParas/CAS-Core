@@ -15,13 +15,31 @@ pub struct DbService {
 }
 
 impl DbService {
-    pub async fn new() -> Self {
-        dotenv().ok();
-        // $env:GOOGLE_APPLICATION_CREDENTIALS = "C:\secure\mi-proyecto-firestore.json"
-        DbService {
-            client: FirestoreDb::new(String::from(var("PROJECT_ID").unwrap()))   
-                .await
-                .expect("Error al inicializar cliente Firestore")
+    // Obtener la instancia global de DbService
+    pub async fn global() -> &'static Mutex<Option<Self>> {
+        static INSTANCE: OnceLock<Mutex<Option<DbService>>> = OnceLock::new();
+        
+        INSTANCE.get_or_init(|| {
+            Mutex::new(None)
+        })
+    }
+
+    // Inicializar la conexión global si aún no está inicializada
+    pub async fn initialize() -> Result<(), String> {
+        let mut global_service = Self::global().await.lock().await;
+        
+        if global_service.is_none() {
+            dotenv().ok();
+            
+            match FirestoreDb::new(String::from(var("PROJECT_ID").unwrap())).await {
+                Ok(client) => {
+                    *global_service = Some(DbService { client });
+                    Ok(())
+                },
+                Err(_) => Err("Error al inicializar cliente Firestore".to_string())
+            }
+        } else {
+            Ok(())
         }
     }
 }
