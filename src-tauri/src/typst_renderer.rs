@@ -102,8 +102,8 @@ pub fn generate_pdf(data: Data) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn generate_typst_content(data: &DocumentData) -> String {
-    let num_equipos = data.equipos.len();
+fn generate_typst_content(data: &MaintenanceData) -> String {
+    let num_equipos = data.identifiers.len();
     let column_num = match num_equipos {
         0..=25 => 1,
         26..=50 => 2,
