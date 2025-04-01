@@ -1,4 +1,5 @@
 mod environment;
+mod tests;
 
 use std::fs;
 use environment::TypstWrapperWorld;
