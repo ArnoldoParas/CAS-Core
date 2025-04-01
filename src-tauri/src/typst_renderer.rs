@@ -75,13 +75,29 @@ pub fn generate_pdf(data: Data) -> Result<(), Box<dyn std::error::Error>> {
         .output
         .expect("Error compiling typst");
 
-    let pdf = typst_pdf::pdf(&document, &PdfOptions::default()).expect("Error exporting PDF");
-    fs::write("src/output/pdf/output.pdf", pdf).expect("Error writing PDF.");
-    println!("Created pdf: `src/output/pdf/output.pdf`");
 
-    let svg = typst_svg::svg_merged(&document, Abs::pt(2.0));
-    fs::write("src/output/svg/output.svg", svg).expect("Error writing SVG.");
-    println!("Created svg: `src/output/svg/output.svg`");
+    match data {
+        Data::Maintenance(_) => {
+            let pdf = typst_pdf::pdf(&document, &PdfOptions::default()).expect("Error exporting PDF");
+            fs::write("src/output/pdf/output.pdf", pdf).expect("Error writing PDF.");
+            println!("Created pdf: `src/output/pdf/output.pdf`");
+        
+            let svg = typst_svg::svg_merged(&document, Abs::pt(2.0));
+            fs::write("src/output/svg/output.svg", svg).expect("Error writing SVG.");
+            println!("Created svg: `src/output/svg/output.svg`");
+        },
+        Data::Label(_) => {
+            let pdf = typst_pdf::pdf(&document, &PdfOptions::default()).expect("Error exporting PDF");
+            fs::write("src/output/pdf/output_label.pdf", pdf).expect("Error writing PDF.");
+            println!("Created pdf: `src/output/pdf/output_label.pdf`");
+        
+            let svg = typst_svg::svg_merged(&document, Abs::pt(0.0));
+            fs::write("src/output/svg/output_label.svg", svg).expect("Error writing SVG.");
+            println!("Created svg: `src/output/svg/output_label.svg`");
+            std::fs::remove_dir_all("src/assets/img/temp").ok();
+        }
+    }
+
 
     Ok(())
 }
