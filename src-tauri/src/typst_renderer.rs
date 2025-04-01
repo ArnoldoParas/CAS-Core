@@ -6,20 +6,40 @@ use environment::TypstWrapperWorld;
 use typst::layout::Abs;
 use typst_pdf::PdfOptions;
 
-struct DocumentData {
-    dependencia: Option<String>,
-    titular: Option<String>,
-    departamento: Option<String>,
-    equipos: Vec<String>,
+use crate::labels::generate_labels;
+
+pub enum LabelStyle {
+    Type1,
+    Type2,
+    CustomType(String)
 }
 
-impl DocumentData {
+enum Data {
+    Maintenance(MaintenanceData),
+    Label(LabelData),
+}
+
+pub struct LabelData {
+    pub style: LabelStyle,
+    pub dependence: String,
+    pub amount: u16,
+    pub start: u16,
+}
+
+pub struct MaintenanceData {
+    dependence: Option<String>,
+    head: Option<String>,
+    department: Option<String>,
+    identifiers: Vec<String>,
+}
+
+impl MaintenanceData {
     fn new(equipos: Vec<String>) -> Self {
         Self {
-            dependencia: None,
-            titular: None,
-            departamento: None,
-            equipos,
+            dependence: None,
+            head: None,
+            department: None,
+            identifiers: equipos,
         }
     }
     
