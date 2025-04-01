@@ -1,6 +1,5 @@
+#[allow(unused_imports)]
 use super::{generate_pdf, Data, LabelData, LabelStyle};
-use std::fs;
-
 
 
 #[test]
