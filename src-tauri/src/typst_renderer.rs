@@ -44,17 +44,17 @@ impl MaintenanceData {
     }
     
     fn with_dependencia(mut self, dependencia: &str) -> Self {
-        self.dependencia = Some(dependencia.to_string());
+        self.dependence = Some(dependencia.to_string());
         self
     }
     
     fn with_titular(mut self, titular: &str) -> Self {
-        self.titular = Some(titular.to_string());
+        self.head = Some(titular.to_string());
         self
     }
     
     fn with_departamento(mut self, departamento: &str) -> Self {
-        self.departamento = Some(departamento.to_string());
+        self.department = Some(departamento.to_string());
         self
     }
 }
