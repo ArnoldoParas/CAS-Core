@@ -64,7 +64,10 @@ pub fn generate_pdf(data: Data) -> Result<(), Box<dyn std::error::Error>> {
     fs::create_dir_all("src/output/pdf")?;
     fs::create_dir_all("src/output/svg")?;
     
-    let typst_content = generate_typst_content(&data);
+    let typst_content = match &data {
+        Data::Maintenance(maintenance_data) => generate_typst_content(maintenance_data),
+        Data::Label(label_data) => generate_labels(label_data).expect("Error generating labels"),
+    };
 
     let world = TypstWrapperWorld::new("./".to_owned(), typst_content);
 
