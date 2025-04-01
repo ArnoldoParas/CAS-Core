@@ -115,7 +115,7 @@ fn generate_typst_content(data: &MaintenanceData) -> String {
     let column_config = format!("columns: ({})", vec!["1fr"; column_num].join(", "));
     
     let mut devices_per_column: Vec<Vec<(usize, &str)>> = vec![Vec::new(); column_num];
-    for (i, device) in data.equipos.iter().enumerate() {
+    for (i, device) in data.identifiers.iter().enumerate() {
         let column_idx = i / 25;
         if column_idx < column_num {
             devices_per_column[column_idx].push((i + 1, device));
@@ -150,12 +150,12 @@ pub fn generate_example_pdf() {
         equipos.push("TEST >:D".to_string());
     }
     
-    let data = DocumentData::new(equipos)
+    let data = MaintenanceData::new(equipos)
         .with_dependencia("FIME")
         .with_titular("Dr. Ejemplo")
         .with_departamento("Sistemas");
     
-    if let Err(e) = generate_pdf(data) {
+    if let Err(e) = generate_pdf(Data::Maintenance(data)) {
         eprintln!("Error generando PDF: {}", e);
     }
 }
