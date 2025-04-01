@@ -60,7 +60,7 @@ impl MaintenanceData {
 }
 
 #[allow(private_interfaces)]
-pub fn generate_pdf(data: DocumentData) -> Result<(), Box<dyn std::error::Error>> {
+pub fn generate_pdf(data: Data) -> Result<(), Box<dyn std::error::Error>> {
     fs::create_dir_all("src/output/pdf")?;
     fs::create_dir_all("src/output/svg")?;
     
