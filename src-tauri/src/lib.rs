@@ -1,6 +1,7 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 pub mod db_service;
 pub mod typst_renderer;
+pub mod labels;
 
 use chrono::{DateTime, Datelike, Utc};
 use rand::Rng;
