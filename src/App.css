@@ -16,8 +16,8 @@
 }
 
 :root {
-  --black: hsl(240, 7%, 24%);
-  --black-secondary: hsl(223, 7%, 20%);
+  --black: rgb(57, 57, 65);
+  --black-secondary: rgb(47, 49, 55);
   --icon-black: invert(17%) sepia(73%) saturate(75%) hue-rotate(201deg) brightness(91%) contrast(84%);
   --white: hsl(45, 15%, 95%);
   --white-secondary: hsl(42, 17%, 88%);
@@ -256,7 +256,6 @@ button {
   padding: 20px 10px 20px 10px;
   overflow: hidden;
   flex-grow: 1;
-  border: 1px solid red;
 }
 
 .work_space h1 {

@@ -28,14 +28,6 @@ export default function Sidebar({ currentView, changeView, toggleTheme }) {
             <p>PDF</p>
           </button>
         </li>
-        <li>
-          <button
-            className={currentView === 'etiquetas' ? 'active' : ''}
-            onClick={() => changeView('etiquetas')}>
-            <img src="../src/assets/icons/tag.svg" alt="App Icon" className='icon' />
-            <p>Etiqueta</p>
-          </button>
-        </li>
       </ul>
     </div>
   )

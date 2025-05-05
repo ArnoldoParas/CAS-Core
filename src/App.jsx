@@ -27,7 +27,7 @@ function App() {
       <div className="work_space">
         {currentView === "general" && <General />}
         {currentView === "pdf" && <PDF />}
-        {currentView === "etiquetas" && <Etiquetas />}
+        {/* {currentView === "etiquetas" && <Etiquetas />} */}
       </div>
     </main>
   );
