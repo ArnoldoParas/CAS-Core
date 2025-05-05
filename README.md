@@ -3,6 +3,11 @@
 </p>
 <h1 align="center">Cas Core</h1>
 
+## Pedentes
+
+En la logica de las etiquetas ahora mismo esta fija a y no es flexible, con esto me refiero a que en el template de las etiquetas esta "hardcodeado" el numero de etiquetas y
+esto debe de ser cambiado para que el template se adapte a la cantidad de etiquetas solicitadas.
+
 ## Requisitos para ejecutar el programa
 
 ### 1. Instalar Rust
