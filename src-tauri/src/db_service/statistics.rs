@@ -63,7 +63,7 @@ impl DbService {
 
     // Método público para obtener estadísticas
     pub async fn get_statistics(&self, year: i32) -> Result<Mantenimiento, FirestoreError> {
-        let documento_estadisticas = dbg!(format!("mantenimiento_{}", year));
+        let documento_estadisticas = format!("mantenimiento_{}", year);
 
         let stat_result = self
             .client
