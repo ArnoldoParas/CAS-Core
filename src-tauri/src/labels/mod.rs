@@ -24,13 +24,13 @@ pub fn generate_labels(label_data: &LabelData) -> Result<String, Box<dyn std::er
     let mut start = label_data.start;
     for i in 0..label_data.amount {
         let text = format!("{}-2025-{:04}", label_data.dependence, start);
-        let image_path = format!("src/assets/img/temp/temp_label_result_{}.png", i+1);
-        
+        let image_path = format!("src/assets/img/temp/temp_label_result_{}.png", i + 1);
+
         generate_single_label(&text, background_path, &image_path)?;
         images.push(image_path);
         start += 1;
     }
-    
+
     println!("generate labels, antes del template");
     let template = include_str!("../assets/templates/etiquetas.typ");
 
@@ -64,9 +64,9 @@ pub fn generate_single_label(
     make_background_transparent(&mut foreground);
     let wide_foreground = generate_wide_barcode(&foreground, 2, 0)?;
     let (foreground, x) = add_text(text.to_string(), wide_foreground)?;
-    
+
     overlay_images(&mut background, &foreground, x, 196)?;
-    
+
     background.save(output_path)?;
 
     std::fs::remove_file(temp_barcode_path).ok();
@@ -74,25 +74,31 @@ pub fn generate_single_label(
     Ok(())
 }
 
-fn generate_wide_barcode(original: &DynamicImage, bar_width_multiplier: u32, bar_spacing: u32) -> Result<DynamicImage, ImageError> {
+fn generate_wide_barcode(
+    original: &DynamicImage,
+    bar_width_multiplier: u32,
+    bar_spacing: u32,
+) -> Result<DynamicImage, ImageError> {
     let (fg_width, fg_height) = original.dimensions();
-    
+
     let bar_width_multiplier = bar_width_multiplier.max(1);
     let bar_spacing = bar_spacing.min(1); // Limit spacing to 1 pixel maximum
 
-    let new_width = fg_width.saturating_mul(bar_width_multiplier).saturating_add(bar_spacing * fg_width);
-    
+    let new_width = fg_width
+        .saturating_mul(bar_width_multiplier)
+        .saturating_add(bar_spacing * fg_width);
+
     let mut wide_barcode = RgbaImage::new(new_width, fg_height);
-    
+
     for pixel in wide_barcode.pixels_mut() {
         *pixel = Rgba([255, 255, 255, 0]);
     }
-    
+
     // Draw wider bars with minimal spacing
     for y in 0..fg_height {
         for x in 0..fg_width {
             let pixel = original.get_pixel(x, y);
-            
+
             if pixel[0] < 240 || pixel[1] < 240 || pixel[2] < 240 {
                 for bx in 0..bar_width_multiplier {
                     let new_x = (x * (bar_width_multiplier + bar_spacing)) + bx;
@@ -103,15 +109,18 @@ fn generate_wide_barcode(original: &DynamicImage, bar_width_multiplier: u32, bar
             }
         }
     }
-    
+
     Ok(DynamicImage::ImageRgba8(wide_barcode))
 }
 
-fn add_text(text: String, img: DynamicImage) -> Result<(DynamicImage, u32), Box<dyn std::error::Error>> {
+fn add_text(
+    text: String,
+    img: DynamicImage,
+) -> Result<(DynamicImage, u32), Box<dyn std::error::Error>> {
     let text_height = 25;
     let margin = 5;
     let (width, height) = img.dimensions();
-   
+
     // Safe offset calculation
     let x: u32 = if width > 430 {
         width / 2
@@ -119,16 +128,13 @@ fn add_text(text: String, img: DynamicImage) -> Result<(DynamicImage, u32), Box<
         215 - (width / 2)
     };
     let x = x + 160;
-    
-    let mut img_with_text = RgbaImage::new(
-        width,
-        height + text_height + margin
-    );
-    
+
+    let mut img_with_text = RgbaImage::new(width, height + text_height + margin);
+
     for pixel in img_with_text.pixels_mut() {
         *pixel = Rgba([255, 255, 255, 0]);
     }
-    
+
     // Copy the barcode to the new image
     for y in 0..height {
         for x in 0..width {
@@ -136,21 +142,22 @@ fn add_text(text: String, img: DynamicImage) -> Result<(DynamicImage, u32), Box<
             img_with_text.put_pixel(x, y, pixel);
         }
     }
-    
+
     let font_data = include_bytes!("../assets/fonts/MYRIADPRO-SEMIBOLD.OTF");
     let font = FontArc::try_from_slice(font_data).expect("Error loading font");
-    
+
     let scale = PxScale::from(25.0);
     let scaled_font = font.as_scaled(scale);
     let color = Rgba([0, 0, 0, 255]);
-    
-    let text_width = text.chars()
+
+    let text_width = text
+        .chars()
         .map(|c| scaled_font.h_advance(scaled_font.glyph_id(c)))
         .sum::<f32>();
-    
+
     let text_x = (width as i32 - text_width as i32) / 2;
     let text_y = height + margin;
-    
+
     draw_text_mut(
         &mut img_with_text,
         color,
@@ -158,11 +165,11 @@ fn add_text(text: String, img: DynamicImage) -> Result<(DynamicImage, u32), Box<
         text_y as i32,
         scale,
         &font,
-        &text
+        &text,
     );
-    
+
     let barcode_with_text = DynamicImage::ImageRgba8(img_with_text);
-    
+
     Ok((barcode_with_text, x))
 }
 
@@ -170,13 +177,13 @@ fn make_background_transparent(img: &mut DynamicImage) {
     if img.color().has_alpha() == false {
         *img = img.to_rgba8().into();
     }
-    
+
     let (width, height) = img.dimensions();
-    
+
     for y in 0..height {
         for x in 0..width {
             let pixel = img.get_pixel(x, y);
-            
+
             // If pixel is white or near-white
             if pixel[0] > 240 && pixel[1] > 240 && pixel[2] > 240 {
                 img.put_pixel(x, y, Rgba([pixel[0], pixel[1], pixel[2], 0]));
@@ -193,27 +200,27 @@ fn overlay_images(
 ) -> Result<(), ImageError> {
     let (fg_width, fg_height) = foreground.dimensions();
     let (bg_width, bg_height) = background.dimensions();
-    
+
     // Adjust offsets if they would go out of bounds
     let safe_x_offset = x_offset.min(bg_width.saturating_sub(fg_width));
     let safe_y_offset = y_offset.min(bg_height.saturating_sub(fg_height));
-    
+
     // Copy pixels from foreground image to background image
     for y in 0..fg_height {
         for x in 0..fg_width {
             let pixel = foreground.get_pixel(x, y);
-            
+
             // Only copy if pixel is not completely transparent
             if pixel[3] > 0 {
                 let bg_x = x + safe_x_offset;
                 let bg_y = y + safe_y_offset;
-                
+
                 if bg_x < bg_width && bg_y < bg_height {
                     background.put_pixel(bg_x, bg_y, pixel);
                 }
             }
         }
     }
-    
+
     Ok(())
 }

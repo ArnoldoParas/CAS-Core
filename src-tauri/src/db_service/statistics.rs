@@ -1,13 +1,17 @@
-use crate::db_service::DbService;
 use super::model::Mantenimiento;
-use firestore::errors::FirestoreError;
+use crate::db_service::DbService;
 use chrono::{DateTime, Datelike, Utc};
+use firestore::errors::FirestoreError;
 
 impl DbService {
     // Método interno para actualizar estadísticas
-    
+
     #[allow(dependency_on_unit_never_type_fallback)]
-    pub(crate) async fn update_maintenance_statistics(&self, fecha: DateTime<Utc>, _dependency: String) -> Result<(), FirestoreError> {
+    pub(crate) async fn update_maintenance_statistics(
+        &self,
+        fecha: DateTime<Utc>,
+        _dependency: String,
+    ) -> Result<(), FirestoreError> {
         let mes = match fecha.month() {
             1 => "enero",
             2 => "febrero",
@@ -23,12 +27,12 @@ impl DbService {
             12 => "diciembre",
             _ => "Enero", // Error no manejado correctamente
         };
-        
+
         let documento_estadisticas = format!("mantenimiento_{}", fecha.year());
-        
+
         // Intentar obtener el documento de estadísticas existente, si no existe lo crea
         let mut estadisticas = self.get_statistics(fecha.year()).await?;
-        
+
         match mes {
             "enero" => estadisticas.enero += 1,
             "febrero" => estadisticas.febrero += 1,
@@ -44,7 +48,7 @@ impl DbService {
             "diciembre" => estadisticas.diciembre += 1,
             _ => {}
         }
-        
+
         self.client
             .fluent()
             .update()
@@ -53,15 +57,16 @@ impl DbService {
             .object(&estadisticas)
             .execute()
             .await?;
-        
+
         Ok(())
     }
-    
+
     // Método público para obtener estadísticas
     pub async fn get_statistics(&self, year: i32) -> Result<Mantenimiento, FirestoreError> {
         let documento_estadisticas = dbg!(format!("mantenimiento_{}", year));
 
-        let stat_result = self.client
+        let stat_result = self
+            .client
             .fluent()
             .select()
             .by_id_in("stats")
@@ -70,9 +75,7 @@ impl DbService {
             .await;
 
         match stat_result {
-            Ok(Some(result)) => {
-                Ok(result)
-            },
+            Ok(Some(result)) => Ok(result),
             _ => {
                 let nueva_estadistica = Mantenimiento {
                     enero: 0,

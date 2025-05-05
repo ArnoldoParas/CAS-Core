@@ -28,11 +28,10 @@ rand = "0.9.0"
 dotenv = "0.15.0"
 
 #labels
-barcoders = {version = "2.0.0", features = ["image"]}
+barcoders = {version = "2.0.0", features = ["image"] }
 image = "0.25.6"
 imageproc = "0.25.0"
 ab_glyph = "0.2.29"
-
 
 #pdf/svg
 typst = "0.13.1"
@@ -53,3 +52,5 @@ ureq = "2.9"
 # utils
 time = "0.3"
 ttf-parser = "0.25"
+
+tauri-plugin-dialog = "2"

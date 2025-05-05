@@ -30,5 +30,5 @@ pub struct Mantenimiento {
     pub septiembre: u16,
     pub octubre: u16,
     pub noviembre: u16,
-    pub diciembre: u16
+    pub diciembre: u16,
 }
