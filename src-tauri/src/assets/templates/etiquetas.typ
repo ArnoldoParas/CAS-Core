@@ -7,12 +7,6 @@
     bottom: 12.7mm,
     left: 4.2mm,
   )
-//  margin: ( 
-//    top: 1.34cm,
-//    right: 0.41cm,
-//    bottom: 1.24cm,
-//    left: 0.41cm,
-//  )
 ) 
 
 #grid(
