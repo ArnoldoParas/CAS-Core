@@ -3,10 +3,10 @@
 </p>
 <h1 align="center">Cas Core</h1>
 
-## Pedentes
+## Pendientes
 
-En la logica de las etiquetas ahora mismo esta fija a y no es flexible, con esto me refiero a que en el template de las etiquetas esta "hardcodeado" el numero de etiquetas y
-esto debe de ser cambiado para que el template se adapte a la cantidad de etiquetas solicitadas.
+Ahora mismo como tal no se utiliza el template de etiquetasy se esta generando el template en el codigo, esto debera cambiar en el funuto para que el codigo
+importe el template y luego le haga la modficacion en codigo.
 
 ## Requisitos para ejecutar el programa
 
