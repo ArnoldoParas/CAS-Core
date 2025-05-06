@@ -51,27 +51,20 @@ impl DbService {
         Ok(equipo)
     }
 
-    // pub async fn get_all_dependencies(&self) -> Result<Vec<String>, FirestoreError> {
-    //     // Esta es otra forma de obtener los metadatos
-    //     let collection_path = format!("projects/{}/databases/(default)/documents/dependencias", 
-    //                                  self.client.project_id());
-        
-    //     // Obtener los documentos directamente de la API REST
-    //     let response = self.client
-    //         .get_documents(&collection_path, false)
-    //         .await?;
-        
-    //     // Extraer los IDs de los documentos
-    //     let ids: Vec<String> = response.documents
-    //         .into_iter()
-    //         .filter_map(|doc| {
-    //             let path = doc.name;
-    //             path.split('/').last().map(String::from)
-    //         })
-    //         .collect();
-        
-    //     Ok(ids)
-    // }
+    pub async fn get_all_dependency_names(&self) -> Result<Vec<String>, FirestoreError> {
+        let dependencies: Vec<String> = self
+            .client
+            .fluent()
+            .select()
+            .from("dependencias")
+            .query()
+            .await?
+            .into_iter()
+            .map(|doc| doc.name) // Mapea los resultados para obtener solo los nombres
+            .collect();
+
+        Ok(dependencies)
+    }
 
     // Otros métodos relacionados con equipos...
 }
