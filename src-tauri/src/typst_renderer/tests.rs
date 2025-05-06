@@ -10,7 +10,7 @@ fn label_test() {
     let data = LabelData {
         style: LabelStyle::Type1,
         dependence: "FIME".to_string(),
-        amount: 20,
+        amount: 85,
         start: 1,
     };
 
