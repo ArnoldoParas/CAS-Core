@@ -8,6 +8,8 @@
 Ahora mismo como tal no se utiliza el template de etiquetasy se esta generando el template en el codigo, esto debera cambiar en el funuto para que el codigo
 importe el template y luego le haga la modficacion en codigo.
 
+Cuando hay un problema al generar las etiquetas y crashea agregar codigo para eliminar esa carpeta temporal.
+
 ## Requisitos para ejecutar el programa
 
 ### 1. Instalar Rust
