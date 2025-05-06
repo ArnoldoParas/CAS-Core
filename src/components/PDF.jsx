@@ -1,41 +1,23 @@
-// import { save } from "@tauri-apps/plugin-dialog";
-// import { invoke } from "@tauri-apps/api/core";
-
-// export default function PDF() {
-//   async function generate_pdf() {
-//     const path = await save({
-//       title: "Guardar archivo PDF",
-//       defaultPath: "documento.pdf",
-//       filters: [
-//         {
-//           name: "PDF",
-//           extensions: ["pdf"],
-//         },
-//       ],
-//     });
-
-//     if (path) {
-//       // Llama al comando `pdf` y pásale la ruta seleccionada
-//       // await invoke("pdf", { ruta: path });
-//       console.log("Ruta seleccionada:", path);
-//     }
-//   }
-
-//   return (
-//     <div>
-//       <h1>PDF</h1>
-//       <button onClick={generate_pdf}>PDF! :D</button>
-//     </div>
-//   );
-// }
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
 
 export default function PDF() {
   const [style, setStyle] = useState("Type1");
   const [dependence, setDependence] = useState("FIME");
   const [pages, setPages] = useState(1);
+  const [dependencies, setDependencies] = useState([]); // Estado para almacenar las dependencias
+
+  useEffect(() => {
+    // Obtener las dependencias al cargar el componente
+    async function fetchDependencies() {
+      const t = await invoke("get_all_d");
+      console.log("Datos de la base de datos:", t);
+      setDependencies(t); // Guardar las dependencias en el estado
+    }
+
+    fetchDependencies();
+  }, []);
 
   async function generate_pdf() {
     const path = await save({
@@ -61,7 +43,6 @@ export default function PDF() {
       console.log("Ruta seleccionada:", path);
       console.log("Datos del formulario:", data);
 
-      // Aquí puedes usar invoke en el futuro:
       // await invoke("pdf", { ruta: path, ...data });
     }
   }
@@ -75,7 +56,6 @@ export default function PDF() {
           Estilo:
           <select value={style} onChange={(e) => setStyle(e.target.value)}>
             <option value="Type1">Type1</option>
-            <option value="Type2">Type2</option>
           </select>
         </label>
       </div>
@@ -84,9 +64,11 @@ export default function PDF() {
         <label>
           Dependencia:
           <select value={dependence} onChange={(e) => setDependence(e.target.value)}>
-            <option value="FIME">FIME</option>
-            <option value="FCFM">FCFM</option>
-            <option value="FACPYA">FACPYA</option>
+            {dependencies.map((dep, index) => (
+              <option key={index} value={dep}>
+                {dep}
+              </option>
+            ))}
           </select>
         </label>
       </div>
