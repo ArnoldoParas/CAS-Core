@@ -24,6 +24,22 @@ async fn get_all() -> String {
     equipos
 }
 
+#[tauri::command]
+async fn get_all_d() -> Vec<String> {
+    let db_service = DbService::get_instance()
+        .await
+        .expect("No se pudo obtener la instancia de DbService");
+
+    let equipos = db_service.get_all_dependency_names().await.unwrap();
+
+    let nombres: Vec<String> = equipos
+        .into_iter()
+        .map(|ruta| ruta.split('/').last().unwrap().to_string())
+        .collect();
+
+    nombres
+}
+
 fn serialize_equipos(equipos: Vec<Equipo>) -> Result<String, serde_json::Error> {
     serde_json::to_string(&equipos)
 }
@@ -168,6 +184,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             get_all,
+            get_all_d,
             insert,
             delete_by_id,
             pdf,
