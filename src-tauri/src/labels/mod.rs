@@ -31,10 +31,71 @@ pub fn generate_labels(label_data: &LabelData) -> Result<String, Box<dyn std::er
         start += 1;
     }
 
-    println!("generate labels, antes del template");
-    let template = include_str!("../assets/templates/etiquetas.typ");
+    // Generar dinámicamente el contenido del template etiquetas.typ
+    let mut pages = String::new();
+    for page_chunk in images.chunks(40) {
+        let mut left_stack = String::new();
+        let mut right_stack = String::new();
 
-    Ok(template.to_string())
+        for (i, row_chunk) in page_chunk.chunks(2).enumerate() {
+            let left_image = row_chunk.get(0).map_or(String::new(), |img| {
+                format!("image(\"{}\", width: 50.8mm, height: 25.4mm),\n", img)
+            });
+
+            let right_image = row_chunk.get(1).map_or(String::new(), |img| {
+                format!("image(\"{}\", width: 50.8mm, height: 25.4mm),\n", img)
+            });
+
+            if i < 10 {
+                left_stack.push_str(&format!(
+                    "box(\n  stack(dir: ltr, spacing: 0pt,\n    {}    {}\n  )\n),\n",
+                    left_image, right_image
+                ));
+            } else {
+                right_stack.push_str(&format!(
+                    "box(\n  stack(dir: ltr, spacing: 0pt,\n    {}    {}\n  )\n),\n",
+                    left_image, right_image
+                ));
+            }
+        }
+
+        pages.push_str(&format!(
+            r#"
+#grid(
+  columns: (101.6mm, 101.6mm),
+  column-gutter: 4.8mm,
+  stack(
+    {}
+  ),
+  stack(
+    {}
+  )
+)
+#pagebreak()
+"#,
+            left_stack, right_stack
+        ));
+    }
+
+    // Eliminar el último #pagebreak() para evitar un salto innecesario
+    if pages.ends_with("#pagebreak()\n") {
+        pages.truncate(pages.len() - "#pagebreak()\n".len());
+    }
+
+    let template = format!(
+        r#"
+// Original label size 5.05 cm wide
+#set page(
+  paper: "us-letter",
+  margin: (top: 12.7mm, right: 3.7mm, bottom: 12.7mm, left: 4.2mm)
+)
+
+{}
+"#,
+        pages
+    );
+
+    Ok(template)
 }
 
 pub fn generate_single_label(
