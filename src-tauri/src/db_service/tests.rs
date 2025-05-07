@@ -1,7 +1,16 @@
-// use super::DbService;
+use crate::db_service::{self, DbService};
 
+#[tokio::test]
+async fn get_dependency_count() {
+  db_service::DbService::initialize()
+    .await
+    .expect("Error inicializando base de datos");
 
-// #[test]
-// fn get_all_equipments() {
-//   DbService::initialize().await.unwrap();
-// }
+  let db_service = DbService::get_instance()
+    .await
+    .expect("No se pudo obtener la instancia de DbService");
+  
+  let count = db_service.get_dependency_count("FARQ").await.unwrap();
+  println!("Dependency count: {}", count);
+  assert!(count == 7);
+}
