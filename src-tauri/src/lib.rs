@@ -8,7 +8,7 @@ use rand::Rng;
 use tauri::async_runtime::block_on;
 
 use db_service::{model::Equipo, DbService};
-use typst_renderer::generate_example_pdf;
+use typst_renderer::Data;
 
 #[tauri::command]
 async fn get_all() -> String {
@@ -38,6 +38,32 @@ async fn get_all_d() -> Vec<String> {
         .collect();
 
     nombres
+}
+
+#[tauri::command]
+async fn pdf(mut data: Data) -> Result<bool, String> {
+    let db_service = DbService::get_instance()
+        .await
+        .expect("No se pudo obtener la instancia de DbService");
+
+    if let Data::Label(ref mut label_data) = data {
+        label_data.start = db_service.get_dependency_count(&label_data.dependence).await.unwrap_or(0) as u16;
+        match typst_renderer::generate_pdf(data) {
+            Ok(success) => Ok(success),
+            Err(e) => Err(e.to_string())
+        }
+    } else {
+        Err("Expected Data::Label variant".to_string())
+    }
+}
+
+#[tauri::command]
+async fn save_pdf(path: String) -> Result<(), String> {
+    println!("PDF path: {}", path);
+    
+    std::fs::copy("src/output/pdf/output_label.pdf", &path)
+        .map(|_| ())
+        .map_err(|e| format!("Error saving PDF: {}", e))
 }
 
 fn serialize_equipos(equipos: Vec<Equipo>) -> Result<String, serde_json::Error> {
@@ -152,11 +178,6 @@ async fn asdf(id: &i32) -> Equipo {
 }
 
 #[tauri::command]
-fn pdf() {
-    generate_example_pdf();
-}
-
-#[tauri::command]
 async fn get_maintenance_stats() -> Result<String, String> {
     let db_service = DbService::get_instance()
         .await
@@ -185,6 +206,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             get_all,
             get_all_d,
+            save_pdf,
             insert,
             delete_by_id,
             pdf,
