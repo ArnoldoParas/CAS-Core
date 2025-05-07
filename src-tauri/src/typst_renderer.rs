@@ -2,23 +2,27 @@ mod environment;
 mod tests;
 
 use environment::TypstWrapperWorld;
+use serde::{Deserialize, Serialize};
 use std::fs;
 use typst::layout::Abs;
 use typst_pdf::PdfOptions;
 
 use crate::labels::generate_labels;
 
+#[derive(Serialize, Deserialize, Debug)]
 pub enum LabelStyle {
     Type1,
     Type2,
     CustomType(String),
 }
 
-enum Data {
+#[derive(Serialize, Deserialize, Debug)]
+pub enum Data {
     Maintenance(MaintenanceData),
     Label(LabelData),
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct LabelData {
     pub style: LabelStyle,
     pub dependence: String,
@@ -26,6 +30,7 @@ pub struct LabelData {
     pub start: u16,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
 pub struct MaintenanceData {
     dependence: Option<String>,
     head: Option<String>,
@@ -60,7 +65,7 @@ impl MaintenanceData {
 }
 
 #[allow(private_interfaces)]
-pub fn generate_pdf(data: Data) -> Result<(), Box<dyn std::error::Error>> {
+pub fn generate_pdf(data: Data) -> Result<bool, Box<dyn std::error::Error>> {
     fs::create_dir_all("src/output/pdf")?;
     fs::create_dir_all("src/output/svg")?;
 
@@ -99,7 +104,7 @@ pub fn generate_pdf(data: Data) -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    Ok(())
+    Ok(true)
 }
 
 fn generate_typst_content(data: &MaintenanceData) -> String {
