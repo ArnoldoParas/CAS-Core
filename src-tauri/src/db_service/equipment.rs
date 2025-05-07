@@ -1,4 +1,4 @@
-use super::model::Equipo;
+use super::model::{Dependencia, Equipo};
 use crate::db_service::DbService;
 
 use firestore::errors::FirestoreError;
@@ -66,5 +66,19 @@ impl DbService {
         Ok(dependencies)
     }
 
+    pub async fn get_dependency_count(&self, dependency: &str) -> Result<u64, FirestoreError> {
+        let doc: Option<Dependencia> = self
+            .client
+            .fluent()
+            .select()
+            .by_id_in("dependencias")
+            .obj()
+            .one(dependency)
+            .await?;
+
+        let count = doc.unwrap().count;
+        Ok(count)
+
     // Otros métodos relacionados con equipos...
+    }
 }
