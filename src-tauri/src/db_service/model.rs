@@ -14,7 +14,15 @@ pub struct Equipo {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Dependencia {
-    pub groups: Vec<String>,
+    pub count: u64,
+    #[serde(default)]
+    pub groups: Vec<DependenciaGrupo>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct DependenciaGrupo {
+    pub encargado: String,
+    pub grupo: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
