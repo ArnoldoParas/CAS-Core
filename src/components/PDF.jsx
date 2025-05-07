@@ -1,28 +1,59 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
+import { downloadDir } from '@tauri-apps/api/path';
 
 export default function PDF() {
   const [style, setStyle] = useState("Type1");
   const [dependence, setDependence] = useState("FIME");
   const [pages, setPages] = useState(1);
-  const [dependencies, setDependencies] = useState([]); // Estado para almacenar las dependencias
+  const [dependencies, setDependencies] = useState([]);
+  const [generatedPdfData, setGeneratedPdfData] = useState(null);
+  const [pdfReady, setPdfReady] = useState(false);
 
   useEffect(() => {
     // Obtener las dependencias al cargar el componente
     async function fetchDependencies() {
-      const t = await invoke("get_all_d");
-      console.log("Datos de la base de datos:", t);
-      setDependencies(t); // Guardar las dependencias en el estado
+      const v_dependencies = await invoke("get_all_d");
+      console.log("Datos de la base de datos:", v_dependencies);
+      setDependencies(v_dependencies); // Guardar las dependencias en el estado
     }
 
     fetchDependencies();
   }, []);
 
   async function generate_pdf() {
+    console.log("Generating PDF..."); // Debug log
+    const amount = pages * 40;
+    const data = {
+      Label: { // Wrap in Label variant to match Rust enum
+        style,
+        dependence,
+        amount,
+        start: 1 // Required by Rust struct
+      }
+    };
+
+    try {
+      console.log("Calling Tauri command with data:", data); // Debug log
+      const success = await invoke("pdf", { data });
+      console.log("PDF generation result:", success); // Debug log
+      setPdfReady(success);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+    }
+  }
+
+  async function savePdfFile() {
+    const now = new Date();
+    const dateStr = now.toISOString()
+        .replace(/[:.]/g, '-')
+        .replace('T', '_')
+        .slice(0, 19); // Format: YYYY-MM-DD_HH-mm-ss
+
     const path = await save({
-      title: "Guardar archivo PDF",
-      defaultPath: "documento.pdf",
+      title: "Etiquetas-CAS",
+      defaultPath: await downloadDir(),
       filters: [
         {
           name: "PDF",
@@ -32,18 +63,13 @@ export default function PDF() {
     });
 
     if (path) {
-      const amount = pages * 40;
-
-      const data = {
-        style,
-        dependence,
-        amount,
-      };
-
-      console.log("Ruta seleccionada:", path);
-      console.log("Datos del formulario:", data);
-
-      // await invoke("pdf", { ruta: path, ...data });
+      try {
+        await invoke("save_pdf", { path, pdfData: generatedPdfData });
+        setGeneratedPdfData(null); // Reset after saving
+        console.log("PDF path:", path);
+      } catch (error) {
+        console.error("Error saving PDF:", error);
+      }
     }
   }
 
@@ -85,7 +111,10 @@ export default function PDF() {
         </label>
       </div>
 
-      <button onClick={generate_pdf}>Seleccionar ruta y generar PDF</button>
+      <button onClick={generate_pdf}>Generar PDF</button>
+      {pdfReady && (
+        <button onClick={savePdfFile}>Guardar PDF</button>
+      )}
     </div>
   );
 }
