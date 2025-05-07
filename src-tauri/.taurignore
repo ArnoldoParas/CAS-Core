@@ -1,0 +1,10 @@
+src/output/**
+src/output/pdf/**
+src/output/svg/**
+**/output_label.pdf
+**/output.pdf
+**/output_label.svg
+**/output.svg
+src/assets/img/temp/**
+src-tauri/src/assets/img/temp/**
+**/assets/img/temp/**
