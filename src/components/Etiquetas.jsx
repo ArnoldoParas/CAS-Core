@@ -1,4 +1,4 @@
-import LineGraph from "./line";
+import LineGraph from "./Line";
 import BarGraph from "./Bar";
 import '../App.css';
 
