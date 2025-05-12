@@ -56,6 +56,10 @@ Copy-Item -Path ".\service.json" -Destination "C:\Program Files\CasCore\config\"
 ```
 O bien pega las credenciales en la carpeta.
 
+### Configurar variables de entorio
+
+Es SUMAMENTE importante asegurarse de que las variables de entorno PROJECT_ID y GOOGLE_APPLICATION_CREDENTIALS existan en tu sistema, de otra manera la aplicacion fallara
+
 
 ### Limpieza al desinstalar
 1. Eliminar archivo .env
