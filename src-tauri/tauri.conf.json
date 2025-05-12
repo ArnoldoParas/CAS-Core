@@ -20,7 +20,8 @@
         "width": 1250,
         "height": 750,
         "maxWidth": 1920,
-        "maxHeight": 1080
+        "maxHeight": 1080,
+        "devtools": true
       }
     ],
     "security": {
@@ -36,6 +37,9 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "resources": [
+      "assets/**/*"
     ]
   }
 }
