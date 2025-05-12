@@ -77,7 +77,7 @@ async fn pdf(mut data: Data) -> Result<bool, String> {
 async fn save_pdf(path: String) -> Result<(), String> {
     println!("PDF path: {}", path);
     
-    std::fs::copy("src/output/pdf/output_label.pdf", &path)
+    std::fs::copy("output/pdf/output_label.pdf", &path)
         .map(|_| ())
         .map_err(|e| format!("Error saving PDF: {}", e))
 }
