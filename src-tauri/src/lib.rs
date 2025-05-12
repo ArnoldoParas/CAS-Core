@@ -5,10 +5,11 @@ pub mod typst_renderer;
 
 use chrono::{DateTime, Datelike, Utc};
 use rand::Rng;
-use tauri::async_runtime::block_on;
 
 use db_service::{model::Equipo, DbService};
 use typst_renderer::Data;
+#[allow(unused_imports)]
+use tauri::async_runtime::block_on;
 
 #[tauri::command]
 async fn get_all() -> String {
