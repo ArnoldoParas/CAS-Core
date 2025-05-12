@@ -66,8 +66,8 @@ impl MaintenanceData {
 
 #[allow(private_interfaces)]
 pub fn generate_pdf(data: Data) -> Result<bool, Box<dyn std::error::Error>> {
-    fs::create_dir_all("src/output/pdf")?;
-    fs::create_dir_all("src/output/svg")?;
+    fs::create_dir_all("output/pdf")?;
+    fs::create_dir_all("output/svg")?;
 
     let typst_content = match &data {
         Data::Maintenance(maintenance_data) => generate_typst_content(maintenance_data),
@@ -84,23 +84,23 @@ pub fn generate_pdf(data: Data) -> Result<bool, Box<dyn std::error::Error>> {
         Data::Maintenance(_) => {
             let pdf =
                 typst_pdf::pdf(&document, &PdfOptions::default()).expect("Error exporting PDF");
-            fs::write("src/output/pdf/output.pdf", pdf).expect("Error writing PDF.");
-            println!("Created pdf: `src/output/pdf/output.pdf`");
+            fs::write("output/pdf/output.pdf", pdf).expect("Error writing PDF.");
+            println!("Created pdf: `output/pdf/output.pdf`");
 
             let svg = typst_svg::svg_merged(&document, Abs::pt(2.0));
-            fs::write("src/output/svg/output.svg", svg).expect("Error writing SVG.");
-            println!("Created svg: `src/output/svg/output.svg`");
+            fs::write("output/svg/output.svg", svg).expect("Error writing SVG.");
+            println!("Created svg: `output/svg/output.svg`");
         }
         Data::Label(_) => {
             let pdf =
                 typst_pdf::pdf(&document, &PdfOptions::default()).expect("Error exporting PDF");
-            fs::write("src/output/pdf/output_label.pdf", pdf).expect("Error writing PDF.");
-            println!("Created pdf: `src/output/pdf/output_label.pdf`");
+            fs::write("output/pdf/output_label.pdf", pdf).expect("Error writing PDF.");
+            println!("Created pdf: `output/pdf/output_label.pdf`");
 
             let svg = typst_svg::svg_merged(&document, Abs::pt(0.0));
-            fs::write("src/output/svg/output_label.svg", svg).expect("Error writing SVG.");
-            println!("Created svg: `src/output/svg/output_label.svg`");
-            std::fs::remove_dir_all("src/assets/img/temp").ok();
+            fs::write("output/svg/output_label.svg", svg).expect("Error writing SVG.");
+            println!("Created svg: `output/svg/output_label.svg`");
+            std::fs::remove_dir_all("assets/img/temp").ok();
         }
     }
 
@@ -140,7 +140,7 @@ fn generate_typst_content(data: &MaintenanceData) -> String {
         .collect::<Vec<String>>()
         .join(",\n");
 
-    let template = include_str!("./assets/templates/mantenimiento_preventivo_fime.typ");
+    let template = include_str!("../assets/templates/mantenimiento_preventivo_fime.typ");
 
     let content = template
         .replace("{{TOTAL_EQUIPOS}}", &num_equipos.to_string())
