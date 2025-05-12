@@ -27,15 +27,30 @@ async fn get_all() -> String {
 
 #[tauri::command]
 async fn get_all_d() -> Vec<String> {
+    // Inicializa la base de datos de forma asíncrona
+    if let Err(e) = db_service::DbService::initialize().await {
+        eprintln!("Error inicializando base de datos: {:?}", e);
+        return vec![]; // Devuelve un vector vacío en caso de error
+    }
+
+    // Obtén la instancia del servicio de base de datos
     let db_service = DbService::get_instance()
         .await
         .expect("No se pudo obtener la instancia de DbService");
 
-    let equipos = db_service.get_all_dependency_names().await.unwrap();
+    // Obtén los nombres de las dependencias
+    let equipos = match db_service.get_all_dependency_names().await {
+        Ok(equipos) => equipos,
+        Err(e) => {
+            eprintln!("Error obteniendo nombres de dependencias: {:?}", e);
+            return vec![]; // Devuelve un vector vacío en caso de error
+        }
+    };
 
+    // Procesa los nombres para extraer la última parte de la ruta
     let nombres: Vec<String> = equipos
         .into_iter()
-        .map(|ruta| ruta.split('/').last().unwrap().to_string())
+        .map(|ruta| ruta.split('/').last().unwrap_or("").to_string())
         .collect();
 
     nombres
