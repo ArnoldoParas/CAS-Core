@@ -13,18 +13,18 @@ use crate::typst_renderer::{LabelData, LabelStyle};
 
 pub fn generate_labels(label_data: &LabelData) -> Result<String, Box<dyn std::error::Error>> {
     let mut images = Vec::new();
-    fs::create_dir_all("src/assets/img/temp")?;
+    fs::create_dir_all("assets/img/temp")?;
 
     let background_path = match label_data.style {
-        LabelStyle::Type1 => "src/assets/templates/tag01.png",
-        LabelStyle::Type2 => "src/assets/templates/tag02_v1.png",
+        LabelStyle::Type1 => "assets/templates/tag01.png",
+        LabelStyle::Type2 => "assets/templates/tag02_v1.png",
         LabelStyle::CustomType(ref path) => path,
     };
 
     let mut start = label_data.start;
     for i in 0..label_data.amount {
         let text = format!("{}-2025-{:04}", label_data.dependence, start);
-        let image_path = format!("src/assets/img/temp/temp_label_result_{}.png", i + 1);
+        let image_path = format!("assets/img/temp/temp_label_result_{}.png", i + 1);
 
         generate_single_label(&text, background_path, &image_path)?;
         images.push(image_path);
@@ -110,14 +110,24 @@ pub fn generate_single_label(
     let bytes = png.generate(&encoded[..]).unwrap();
 
     let mut temp_barcode_path = Path::new(env!("CARGO_MANIFEST_DIR")).to_path_buf();
-    temp_barcode_path.push("src/assets/img/temp/temp_barcode.png");
+    temp_barcode_path.push("assets/img/temp/temp_barcode.png");
+
+    // Crear el directorio si no existe
+    if let Some(parent) = temp_barcode_path.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
 
     {
-        let file = File::create(&Path::new(&temp_barcode_path)).unwrap();
+        let file = File::create(&temp_barcode_path).map_err(|e| {
+            eprintln!("Error al crear el archivo: {}", e);
+            e
+        })?;
         let mut writer = BufWriter::new(file);
         writer.write(&bytes[..]).unwrap();
         writer.flush().unwrap();
     }
+
+    println!("Ruta completa: {:?}", temp_barcode_path);
 
     let mut background = image::open(background_path)?;
     let mut foreground = image::open(&temp_barcode_path)?;
@@ -204,7 +214,7 @@ fn add_text(
         }
     }
 
-    let font_data = include_bytes!("../assets/fonts/MYRIADPRO-SEMIBOLD.OTF");
+    let font_data = include_bytes!("../../assets/fonts/MYRIADPRO-SEMIBOLD.OTF");
     let font = FontArc::try_from_slice(font_data).expect("Error loading font");
 
     let scale = PxScale::from(25.0);
