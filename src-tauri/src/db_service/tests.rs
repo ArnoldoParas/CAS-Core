@@ -1,3 +1,4 @@
+#[allow(unused_imports)]
 use crate::db_service::{self, DbService};
 
 #[tokio::test]
