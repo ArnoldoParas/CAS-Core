@@ -2,6 +2,20 @@ import { invoke } from "@tauri-apps/api/core";
 import { useState } from "react";
 import Tarjeta from "./Tarjeta";
 
+// Material UI
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Alert from '@mui/material/Alert';
+import CircularProgress from '@mui/material/CircularProgress';
+
+// Íconos
+import FormatListNumberedIcon from '@mui/icons-material/FormatListNumbered';
+import AddToQueueIcon from '@mui/icons-material/AddToQueue';
+import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
+
 export default function General() {
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -12,88 +26,178 @@ export default function General() {
     try {
       setLoading(true);
       const response = await invoke("get_all");
-      // Convertir la respuesta a objeto si viene como string
       const data = typeof response === 'string' ? JSON.parse(response) : response;
       setEquipos(data);
-      // setMsg(response);
     } catch (err) {
       console.error(err);
+      setMsg("Error al obtener los equipos.");
     } finally {
       setLoading(false);
     }
   }
 
   async function insert() {
-    setMsg(await invoke("insert"));
-
+    try {
+      setMsg(await invoke("insert"));
+    } catch (err) {
+      console.error(err);
+      setMsg("Error al insertar el equipo.");
+    }
   }
 
   async function delete_by_id() {
-    setMsg(await invoke("delete_by_id"));
+    try {
+      setMsg(await invoke("delete_by_id"));
+    } catch (err) {
+      console.error(err);
+      setMsg("Error al eliminar el equipo.");
+    }
   }
 
   async function insert_e() {
-    // Convert the string input to a number
     const numValue = parseInt(num, 10);
 
     if (isNaN(numValue) || numValue <= 0) {
       setMsg("Por favor ingrese un número válido mayor que cero.");
       return;
     }
-    
+
     setLoading(true);
-    await invoke("insert_e", { num: numValue });
-    setMsg(`Se insertaron ${numValue} equipos con éxito.`);
-    setNum(""); // Clear the input after successful insertion
+    try {
+      await invoke("insert_e", { num: numValue });
+      setMsg(`Se insertaron ${numValue} equipos con éxito.`);
+      setNum("");
+    } catch (err) {
+      console.error(err);
+      setMsg("Error al insertar múltiples equipos.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <div>
-      <h1>Gestión de Equipos</h1>
-      <h2>Rust side</h2>
-      <div className="button_row">
-        <button onClick={get_all}>
-          Listar Equipos
-        </button>
-        <button onClick={insert}>
-          Insertar Equipo
-        </button>
-        <button onClick={delete_by_id}>
-          Eliminar Equipo
-        </button>
-      </div>
+    <Box sx={{ padding: 3 }}>
+      <Typography variant="h4" gutterBottom align="center">
+        Gestión de Equipos
+      </Typography>
+      <Typography variant="h6" gutterBottom align="center">
+        Rust side
+      </Typography>
 
-      {loading && <p>Cargando...</p>}
+      <Box display="flex" justifyContent="center" marginBottom={2}>
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<FormatListNumberedIcon />}
+            onClick={get_all}
+          >
+            Listar Equipos
+          </Button>
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<AddToQueueIcon />}
+            onClick={insert}
+          >
+            Insertar Equipo
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteSweepIcon />}
+            onClick={delete_by_id}
+          >
+            Eliminar Equipo
+          </Button>
+        </Stack>
+      </Box>
 
-      {!loading && equipos.length === 0 && (
-        <p>
-          No hay equipos para mostrar. Haga clic en "Listar Equipos" para cargar la información.
-        </p>
+      {loading && (
+        <Box display="flex" justifyContent="center" marginTop={2}>
+          <Stack sx={{ color: 'grey.400' }} spacing={2} direction="row">
+            <CircularProgress color="success" />
+          </Stack>
+        </Box>
       )}
 
-      <p>{Msg}</p>
+      {!loading && equipos.length === 0 && (
+        <Box display="flex" justifyContent="center" marginTop={2}>
+          <Stack sx={{ width: '50%' }} spacing={2}>
+            <Alert variant="filled" severity="info">
+              No hay equipos para mostrar. Haga clic en "Listar Equipos" para cargar la información.
+            </Alert>
+          </Stack>
+        </Box>
+      )}
+
+      {Msg && (
+        <Box display="flex" justifyContent="center" marginTop={2}>
+          <Stack sx={{ width: '25%' }} spacing={2}>
+            <Alert
+              variant="filled"
+              severity={
+                Msg.toLowerCase().includes("error") ? "error" :
+                Msg.toLowerCase().includes("éxito") || Msg.toLowerCase().includes("insertaron") ? "success" :
+                "info"
+              }
+            >
+              {Msg}
+            </Alert>
+          </Stack>
+        </Box>
+      )}
 
       <form
         onSubmit={(e) => {
           e.preventDefault();
           insert_e();
-        }}>
-        <input
-          type="number"
-          value={num}
-          onChange={(e) => setNum(e.target.value)}
-          placeholder="Número de equipos"
-          min="1"
-          required
-        />
-        <button type="submit">Insertar</button>
+        }}
+        style={{ marginBottom: '1rem' }}
+      >
+        <Box display="flex" justifyContent="center">
+          <Stack direction="row" spacing={2}>
+            <TextField
+              type="number"
+              label="Número de equipos"
+              value={num}
+              onChange={(e) => setNum(e.target.value)}
+              inputProps={{ min: 1 }}
+              required
+              sx={{
+                backgroundColor: '#f0f0f0',
+                borderRadius: 1,
+                input: { color: 'black' },
+                label: { color: 'gray' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: 'gray' },
+                  '&:hover fieldset': { borderColor: 'black' },
+                  '&.Mui-focused fieldset': { borderColor: 'black' },
+                }
+              }}
+            />
+            <Button type="submit" variant="contained" color="primary">
+              Insertar
+            </Button>
+          </Stack>
+        </Box>
       </form>
 
-      <div className="equipos-grid">
+
+      <Box
+        className="equipos-grid"
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          gap: 2,
+          marginTop: 2,
+        }}
+      >
         {equipos.map((equipo) => (
           <Tarjeta key={equipo.id_equipo} equipo={equipo} />
         ))}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 }

@@ -3,41 +3,58 @@ import { invoke } from "@tauri-apps/api/core";
 import { save } from "@tauri-apps/plugin-dialog";
 import { downloadDir } from '@tauri-apps/api/path';
 
+// MUI 
+import Box from '@mui/material/Box';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+
+// Iconos
+import SaveAsIcon from '@mui/icons-material/SaveAs';
+import SaveIcon from '@mui/icons-material/Save';
+
 export default function PDF() {
-  const [style, setStyle] = useState("Type1");
-  const [dependence, setDependence] = useState("FIME");
+  const [style, setStyle] = useState('');
+  const [dependence, setDependence] = useState('');
   const [pages, setPages] = useState(1);
   const [dependencies, setDependencies] = useState([]);
   const [generatedPdfData, setGeneratedPdfData] = useState(null);
   const [pdfReady, setPdfReady] = useState(false);
 
+  // Dropdown 
+  const [styleOpen, setStyleOpen] = useState(false);
+  const [depOpen, setDepOpen] = useState(false);
+
   useEffect(() => {
-    // Obtener las dependencias al cargar el componente
     async function fetchDependencies() {
       const v_dependencies = await invoke("get_all_d");
-      console.log("Datos de la base de datos:", v_dependencies);
-      setDependencies(v_dependencies); // Guardar las dependencias en el estado
+      setDependencies(v_dependencies);
     }
 
     fetchDependencies();
   }, []);
 
   async function generate_pdf() {
-    console.log("Generating PDF..."); // Debug log
+    if (!style || !dependence) {
+      alert("Selecciona estilo y dependencia antes de continuar.");
+      return;
+    }
+
     const amount = pages * 40;
     const data = {
-      Label: { // Wrap in Label variant to match Rust enum
+      Label: {
         style,
         dependence,
         amount,
-        start: 1 // Required by Rust struct
+        start: 1
       }
     };
 
     try {
-      console.log("Calling Tauri command with data:", data); // Debug log
       const success = await invoke("pdf", { data });
-      console.log("PDF generation result:", success); // Debug log
       setPdfReady(success);
     } catch (error) {
       console.error("Error generating PDF:", error);
@@ -45,12 +62,6 @@ export default function PDF() {
   }
 
   async function savePdfFile() {
-    const now = new Date();
-    const dateStr = now.toISOString()
-        .replace(/[:.]/g, '-')
-        .replace('T', '_')
-        .slice(0, 19); // Format: YYYY-MM-DD_HH-mm-ss
-
     const path = await save({
       title: "Etiquetas-CAS",
       defaultPath: await downloadDir(),
@@ -65,56 +76,118 @@ export default function PDF() {
     if (path) {
       try {
         await invoke("save_pdf", { path, pdfData: generatedPdfData });
-        setGeneratedPdfData(null); // Reset after saving
-        console.log("PDF path:", path);
+        setGeneratedPdfData(null);
       } catch (error) {
         console.error("Error saving PDF:", error);
       }
     }
   }
 
+  const inputStyle = {
+    backgroundColor: '#f5f5f5',
+  };
+
   return (
-    <div>
-      <h1>Generar PDF de etiquetas</h1>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        p: 2,
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          maxWidth: 300,
+          width: '100%',
+        }}
+      >
+        <h1 style={{ textAlign: 'center' }}>Generar PDF de etiquetas</h1>
 
-      <div>
-        <label>
-          Estilo:
-          <select value={style} onChange={(e) => setStyle(e.target.value)}>
-            <option value="Type1">Type1</option>
-          </select>
-        </label>
-      </div>
+        {/* Estilo */}
+        <FormControl size="small" fullWidth>
+          <InputLabel id="style-select-label">Estilo</InputLabel>
+          <Select
+            labelId="style-select-label"
+            id="style-select"
+            open={styleOpen}
+            onOpen={() => setStyleOpen(true)}
+            onClose={() => setStyleOpen(false)}
+            value={style}
+            label="Estilo"
+            onChange={(e) => setStyle(e.target.value)}
+            sx={inputStyle}
+          >
+            <MenuItem value="">
+              <em>Seleccionar</em>
+            </MenuItem>
+            <MenuItem value="Type1">Type1</MenuItem>
+          </Select>
+        </FormControl>
 
-      <div>
-        <label>
-          Dependencia:
-          <select value={dependence} onChange={(e) => setDependence(e.target.value)}>
+        {/* Dependencia */}
+        <FormControl size="small" fullWidth>
+          <InputLabel id="dependence-select-label">Dependencia</InputLabel>
+          <Select
+            labelId="dependence-select-label"
+            id="dependence-select"
+            open={depOpen}
+            onOpen={() => setDepOpen(true)}
+            onClose={() => setDepOpen(false)}
+            value={dependence}
+            label="Dependencia"
+            onChange={(e) => setDependence(e.target.value)}
+            sx={inputStyle}
+          >
+            <MenuItem value="">
+              <em>Seleccionar</em>
+            </MenuItem>
             {dependencies.map((dep, index) => (
-              <option key={index} value={dep}>
+              <MenuItem key={index} value={dep}>
                 {dep}
-              </option>
+              </MenuItem>
             ))}
-          </select>
-        </label>
-      </div>
+          </Select>
+        </FormControl>
 
-      <div>
-        <label>
-          Páginas:
-          <input
-            type="number"
-            min={1}
-            value={pages}
-            onChange={(e) => setPages(parseInt(e.target.value) || 1)}
-          />
-        </label>
-      </div>
 
-      <button onClick={generate_pdf}>Generar PDF</button>
-      {pdfReady && (
-        <button onClick={savePdfFile}>Guardar PDF</button>
-      )}
-    </div>
+        <TextField
+          label="Páginas"
+          type="number"
+          size="small"
+          inputProps={{ min: 1 }}
+          value={pages}
+          onChange={(e) => setPages(parseInt(e.target.value) || 1)}
+          sx={inputStyle}
+          fullWidth
+        />
+
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={generate_pdf}
+          startIcon={<SaveAsIcon />}
+        >
+          Generar PDF
+        </Button>
+
+
+        {pdfReady && (
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={savePdfFile}
+            startIcon={<SaveIcon />}
+          >
+            Guardar PDF
+          </Button>
+        )}
+      </Box>
+    </Box>
   );
 }

@@ -18,7 +18,7 @@ export default function Sidebar({ currentView, changeView, toggleTheme }) {
             className={currentView === 'general' ? 'active' : ''}
             onClick={() => changeView('general')}>
             <img src={chartIcon} alt="App Icon" className='icon' />
-            <p>Analisis</p>
+            <p>Gestionar Registros</p>
           </button>
         </li>
         <li>

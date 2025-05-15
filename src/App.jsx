@@ -5,6 +5,7 @@ import General from "./components/General";
 import PDF from "./components/PDF";
 import Etiquetas from "./components/Etiquetas";
 
+
 function App() {
   const [currentView, setCurrentView] = useState("general");
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "theme-light");
