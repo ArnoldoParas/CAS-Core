@@ -1,7 +1,7 @@
-use super::model::{Dependencia, Equipo};
+use super::model::{Dependencia, DependenciaGrupo, Equipo};
 use crate::db_service::DbService;
 
-use firestore::errors::FirestoreError;
+use firestore::{errors::FirestoreError, struct_path::paths};
 
 impl DbService {
     #[allow(dependency_on_unit_never_type_fallback)]
@@ -23,12 +23,12 @@ impl DbService {
         Ok(())
     }
 
-    pub async fn get_all_equipments(&self) -> Result<Vec<Equipo>, FirestoreError> {
+    pub async fn get_all_equipments(&self, dependency: String) -> Result<Vec<Equipo>, FirestoreError> {
         let equipos = self
             .client
             .fluent()
             .select()
-            .from("FIME")
+            .from(dependency.as_str())
             .obj()
             .query()
             .await?;
@@ -49,6 +49,21 @@ impl DbService {
             .one(&id)
             .await?;
         Ok(equipo)
+    }
+
+    pub async fn get_dependency_data_by_id(
+        &self,
+        id: &str,
+    ) -> Result<Option<Dependencia>, FirestoreError> {
+        let dependency = self
+            .client
+            .fluent()
+            .select()
+            .by_id_in("dependencias")
+            .obj()
+            .one(&id)
+            .await?;
+        Ok(dependency)
     }
 
     pub async fn get_all_dependency_names(&self) -> Result<Vec<String>, FirestoreError> {
@@ -79,6 +94,88 @@ impl DbService {
         let count = doc.unwrap().count;
         Ok(count)
 
-    // Otros métodos relacionados con equipos...
+    }
+
+    pub async fn delete_equipment_by_id(
+        &self,
+        id: String,
+        dependency: String,
+    ) -> Result<(), FirestoreError> {
+        self.client
+            .fluent()
+            .delete()
+            .from(dependency.as_str()) 
+            .document_id(id) 
+            .execute()
+            .await?;
+
+        Ok(())
+    }
+
+    #[allow(dependency_on_unit_never_type_fallback)]
+    pub async fn update_document_by_id(
+        &self,
+        document: Equipo,
+        dependency: String,
+    ) -> Result<(), FirestoreError> {
+        self.client
+            .fluent()
+            .update()
+            .fields(paths!(
+                Equipo::equipo,
+                Equipo::marca,
+                Equipo::modelo,
+                Equipo::referencia_externa,
+                Equipo::grupo
+            ))
+            .in_col(&dependency)
+            .document_id(&document.id_equipo)
+            .object(&document)
+            .execute()
+            .await?;
+
+        Ok(())
+    }
+
+    #[allow(dependency_on_unit_never_type_fallback)]
+    pub async fn update_dependency_by_id(
+        &self,
+        document: DependenciaGrupo,
+        dependency: String,
+    ) -> Result<(), FirestoreError> {
+        // 1. Obtener la dependencia existente
+        let mut existing_dependency: Dependencia = self
+                    .client
+                    .fluent()
+                    .select()
+                    .by_id_in("dependencias")
+                    .obj()
+                    .one(&dependency)
+                    .await.unwrap().unwrap();
+        // 2. Actualizar el vector `grupos`
+        if let Some(existing_group) = existing_dependency
+            .grupos
+            .iter_mut()
+            .find(|g| g.grupo == document.grupo)
+        {
+            // Si el grupo ya existe, actualiza el encargado
+            existing_group.encargado = document.encargado;
+        } else {
+            // Si el grupo no existe, agrégalo al vector
+            existing_dependency.grupos.push(document);
+        }
+
+        // 3. Guardar la dependencia actualizada
+        self.client
+            .fluent()
+            .update()
+            .fields(paths!(Dependencia::grupos))
+            .in_col("dependencias")
+            .document_id(&dependency)
+            .object(&existing_dependency)
+            .execute()
+            .await?;
+
+        Ok(())
     }
 }
