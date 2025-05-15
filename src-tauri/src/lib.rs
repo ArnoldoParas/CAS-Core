@@ -90,13 +90,91 @@ fn serialize_equipos(equipos: Vec<Equipo>) -> Result<String, serde_json::Error> 
 }
 
 #[tauri::command]
-fn insert() -> String {
-    "INSERT :o".to_string()
+async fn insert(equipo: String, dependency: String) -> Result<String, String> {
+    let db_service = DbService::get_instance()
+        .await
+        .expect("No se pudo obtener la instancia de DbService");
+
+    let mut equipo: Equipo = match serde_json::from_str(&equipo) {
+        Ok(equipo) => equipo,
+        Err(err) => {
+            eprintln!("Error deserializando equipo: {}", err);
+            return Err("Error al procesar los datos del equipo.".to_string());
+        }
+    };
+
+    if equipo.ultimo_registro.is_empty() {
+        equipo.ultimo_registro.push(Utc::now());
+    }
+
+    let _ = db_service.insert(equipo, dependency).await;
+    Ok("Equipo insertado con éxito.".to_string())
 }
 
 #[tauri::command]
-fn delete_by_id() -> String {
-    "DELETE >:(".to_string()
+async fn delete_by_id(id: String, dependency: String) -> String {
+    let db_service = DbService::get_instance()
+        .await
+        .expect("No se pudo obtener la instancia de DbService");
+
+    println!("Eliminando equipo: {}, dependencia: {}", id, dependency);
+    let _ = db_service.delete_equipment_by_id(id, dependency).await;
+    "Equipo eliminado".to_string()
+}
+
+#[tauri::command]
+async fn update_equipo(equipo: String, dependency: String) -> Result<String, String> {
+    println!("Actualizando equipo: {}, dependencia: {}", equipo, dependency);
+    let db_service = DbService::get_instance()
+        .await
+        .expect("No se pudo obtener la instancia de DbService");
+
+    let equipo: Equipo = match serde_json::from_str(&equipo) {
+        Ok(equipo) => equipo,
+        Err(err) => {
+            eprintln!("Error deserializando equipo: {}", err);
+            return Err("Error al procesar los datos del equipo.".to_string());
+        }
+    };
+
+    let _ = db_service.update_document_by_id(equipo, dependency).await;
+
+    Ok("Equipo actualizado con éxito.".to_string())
+}
+
+#[tauri::command]
+async fn update_dependency(dependency: String) -> Result<String, String> {
+    let db_service = DbService::get_instance()
+        .await
+        .expect("No se pudo obtener la instancia de DbService");
+
+    let dep = db_service.get_dependency_data_by_id(&dependency).await.unwrap().unwrap();
+
+    match serde_json::to_string(&dep.grupos) {
+        Ok(json) => {
+            print!("Grupos: {}", json);
+            Ok(json)
+        },
+        Err(e) => Err(format!("Error serializando grupos: {}", e)),
+    }
+}
+
+#[tauri::command]
+async fn update_dependency_groups(dependency: String, document: String) -> Result<String, String> {
+    let db_service = DbService::get_instance()
+        .await
+        .expect("No se pudo obtener la instancia de DbService");
+
+    let document: DependenciaGrupo = match serde_json::from_str(&document) {
+        Ok(equipo) => equipo,
+        Err(err) => {
+            eprintln!("Error deserializando equipo: {}", err);
+            return Err("Error al procesar los datos del equipo.".to_string());
+        }
+    };
+
+    let _ = db_service.update_dependency_by_id(document, dependency).await.unwrap();
+    Ok("Grupo actualizado con éxito.".to_string())
 }
 
 #[tauri::command]
@@ -225,6 +303,9 @@ pub fn run() {
             get_all_d,
             save_pdf,
             insert,
+            update_equipo,
+            update_dependency,
+            update_dependency_groups,
             delete_by_id,
             pdf,
             insert_e,
