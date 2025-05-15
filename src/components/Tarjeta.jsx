@@ -1,4 +1,7 @@
 import React from "react";
+import { Card } from 'primereact/card';
+import { Tag } from 'primereact/tag';
+import { Divider } from 'primereact/divider';
 
 function Tarjeta({ equipo }) {
   // Función para formatear la fecha
@@ -13,43 +16,44 @@ function Tarjeta({ equipo }) {
   };
 
   return (
-    <div className="tarjeta">
-      <div className="tarjeta-header">
-        <h2 className="tarjeta-id">{equipo.id_equipo}</h2>
-        <span className="tarjeta-grupo">{equipo.grupo}</span>
-      </div>
-      
-      <div className="tarjeta-contenido">
-        <div className="tarjeta-fila">
-          <span className="tarjeta-etiqueta">Tipo:</span>
-          <span className="tarjeta-valor">{equipo.equipo}</span>
+    <Card 
+      title={`ID: ${equipo.id_equipo}`} 
+      subTitle={<Tag value={equipo.grupo || "Sin grupo"} severity="info" />}
+      className="mb-3"
+    >
+      <div className="p-fluid grid">
+        <div className="field col-12 md:col-6">
+          <label className="font-bold">Tipo</label>
+          <div>{equipo.equipo}</div>
         </div>
-        
-        <div className="tarjeta-fila">
-          <span className="tarjeta-etiqueta">Marca:</span>
-          <span className="tarjeta-valor">{equipo.marca}</span>
+
+        <div className="field col-12 md:col-6">
+          <label className="font-bold">Marca</label>
+          <div>{equipo.marca}</div>
         </div>
-        
-        <div className="tarjeta-fila">
-          <span className="tarjeta-etiqueta">Modelo:</span>
-          <span className="tarjeta-valor">{equipo.modelo}</span>
+
+        <div className="field col-12 md:col-6">
+          <label className="font-bold">Modelo</label>
+          <div>{equipo.modelo}</div>
         </div>
-        
-        <div className="tarjeta-fila">
-          <span className="tarjeta-etiqueta">Ref. Externa:</span>
-          <span className="tarjeta-valor">{equipo.referencia_externa}</span>
+
+        <div className="field col-12 md:col-6">
+          <label className="font-bold">Ref. Externa</label>
+          <div>{equipo.referencia_externa}</div>
         </div>
-        
-        <div className="tarjeta-fila">
-          <span className="tarjeta-etiqueta">Último registro:</span>
-          <span className="tarjeta-valor">
-            {equipo.ultimo_registro && equipo.ultimo_registro.length > 0 
-              ? formatearFecha(equipo.ultimo_registro[0]) 
+
+        <Divider className="col-12" />
+
+        <div className="field col-12">
+          <label className="font-bold">Último registro</label>
+          <div>
+            {equipo.ultimo_registro && equipo.ultimo_registro.length > 0
+              ? formatearFecha(equipo.ultimo_registro[0])
               : "No disponible"}
-          </span>
+          </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
 
