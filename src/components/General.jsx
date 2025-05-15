@@ -22,7 +22,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 // Íconos
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import AddToQueueIcon from "@mui/icons-material/AddToQueue";
-import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import EditIcon from "@mui/icons-material/Edit"; // Importa el ícono de edición
 import editIcon from "../assets/icons/edit.svg";
 import trashIcon from "../assets/icons/trash.svg";
@@ -31,7 +30,6 @@ export default function General() {
   const [equipos, setEquipos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [Msg, setMsg] = useState("");
-  const [num, setNum] = useState("");
   const [dependencies, setDependencies] = useState([]);
   const [dependence, setDependence] = useState("");
   const [showDialog, setShowDialog] = useState(false); // Estado para controlar el diálogo
@@ -44,8 +42,6 @@ export default function General() {
     ultimo_registro: [],
   });
   const [selectedEquipo, setSelectedEquipo] = useState(null); // Estado para el equipo seleccionado
-  const [showDependenciaDialog, setShowDependenciaDialog] = useState(false); // Estado para el diálogo de dependencia
-  const [selectedDependencia, setSelectedDependencia] = useState(""); // Estado para la dependencia seleccionada
   const [dependenciaData, setDependenciaData] = useState([]);
   const [activeTable, setActiveTable] = useState(""); // Estado para controlar la tabla activa ("equipos" o "dependencia")
   const [selectedGrupo, setSelectedGrupo] = useState(null); // Estado para el grupo seleccionado
