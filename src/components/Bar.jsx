@@ -31,6 +31,7 @@ export const options = {
     plugins: {
       legend: {
         position: 'right',
+        onClick: () => {},
       },
       title: {
         display: true,
@@ -38,9 +39,6 @@ export const options = {
         font: {
             size: 20,
         },
-      },
-      legend: {
-          onClick: () => {},
       },
     },
 };
