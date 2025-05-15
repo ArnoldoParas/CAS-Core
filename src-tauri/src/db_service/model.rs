@@ -16,7 +16,7 @@ pub struct Equipo {
 pub struct Dependencia {
     pub count: u64,
     #[serde(default)]
-    pub groups: Vec<DependenciaGrupo>,
+    pub grupos: Vec<DependenciaGrupo>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
