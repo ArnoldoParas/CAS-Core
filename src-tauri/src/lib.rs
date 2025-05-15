@@ -12,12 +12,18 @@ use typst_renderer::Data;
 use tauri::async_runtime::block_on;
 
 #[tauri::command]
-async fn get_all() -> String {
+async fn get_all(dependency: String) -> String {
+    
+    if let Err(e) = db_service::DbService::initialize().await {
+        eprintln!("Error inicializando base de datos: {:?}", e);
+        return String::new();
+    }
+
     let db_service = DbService::get_instance()
         .await
         .expect("No se pudo obtener la instancia de DbService");
 
-    let equipos = db_service.get_all_equipments().await.unwrap();
+    let equipos = db_service.get_all_equipments(dependency).await.unwrap();
     let equipos = match serialize_equipos(equipos) {
         Ok(json_string) => json_string,
         Err(e) => e.to_string(),
@@ -27,13 +33,11 @@ async fn get_all() -> String {
 
 #[tauri::command]
 async fn get_all_d() -> Vec<String> {
-    // Inicializa la base de datos de forma asíncrona
     if let Err(e) = db_service::DbService::initialize().await {
         eprintln!("Error inicializando base de datos: {:?}", e);
-        return vec![]; // Devuelve un vector vacío en caso de error
+        return vec![];
     }
 
-    // Obtén la instancia del servicio de base de datos
     let db_service = DbService::get_instance()
         .await
         .expect("No se pudo obtener la instancia de DbService");
@@ -43,11 +47,10 @@ async fn get_all_d() -> Vec<String> {
         Ok(equipos) => equipos,
         Err(e) => {
             eprintln!("Error obteniendo nombres de dependencias: {:?}", e);
-            return vec![]; // Devuelve un vector vacío en caso de error
+            return vec![];
         }
     };
 
-    // Procesa los nombres para extraer la última parte de la ruta
     let nombres: Vec<String> = equipos
         .into_iter()
         .map(|ruta| ruta.split('/').last().unwrap_or("").to_string())
