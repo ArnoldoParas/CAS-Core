@@ -6,6 +6,7 @@ use firestore::{errors::FirestoreError, struct_path::paths};
 impl DbService {
     #[allow(dependency_on_unit_never_type_fallback)]
     pub async fn insert(&self, document: Equipo, dependency: String) -> Result<(), FirestoreError> {
+        // 1. Insertar el nuevo equipo
         self.client
             .fluent()
             .insert()
@@ -15,6 +16,30 @@ impl DbService {
             .execute()
             .await?;
 
+        // 2. Incrementar el campo `count` de la dependencia
+        let mut existing_dependency: Dependencia = self
+            .client
+            .fluent()
+            .select()
+            .by_id_in("dependencias")
+            .obj()
+            .one(&dependency)
+            .await.unwrap().unwrap();
+
+        existing_dependency.count += 1; // Incrementa el campo `count`
+
+        // 3. Guardar la dependencia actualizada
+        self.client
+            .fluent()
+            .update()
+            .fields(paths!(Dependencia::count)) // Solo actualiza el campo `count`
+            .in_col("dependencias")
+            .document_id(&dependency)
+            .object(&existing_dependency)
+            .execute()
+            .await?;
+
+        // 4. Actualizar estadísticas de mantenimiento si es necesario
         if let Some(ultima_fecha) = document.ultimo_registro.last() {
             self.update_maintenance_statistics(*ultima_fecha, dependency)
                 .await?;
